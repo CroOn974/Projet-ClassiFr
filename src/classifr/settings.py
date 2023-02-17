@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'classifr.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'afpar',
+        'NAME': 'classifr',
         'USER': 'postgres',
         'PASSWORD': '0000',
         'HOST': 'localhost',
