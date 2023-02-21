@@ -43,6 +43,13 @@ class Model(models.Model):
         managed = False
         db_table = 'model'
 
+    def etatStatus(self):
+        if self.status is False:
+            self.status = True
+        else:
+            self.status = False
+        self.save()
+
 
 class Predict(models.Model):
     id_predict = models.AutoField(primary_key=True)
