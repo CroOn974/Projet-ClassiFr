@@ -83,7 +83,6 @@
     },
     methods: {
       async createModel(){
-            console.log(this.model);
             var response = await fetch('http://localhost:8000/api/admin/model/',{
                 method:'post',
                 headers: {
@@ -93,7 +92,6 @@
             });
 
             const newModel = await response.json()
-            console.log(newModel);
             this.models.push(newModel)
             document.getElementById('modal').classList.toggle("hidden")
         },
