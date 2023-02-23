@@ -90,7 +90,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'classifr',
         'USER': 'postgres',
-        'PASSWORD': 'dia974',
+        'PASSWORD': '0000',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -143,5 +143,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DATE_INPUT_FORMATS': ['%Y-%m-%d'],
+    'DATE_INPUT_FORMATS': ['%Y-%m-%d']
 }

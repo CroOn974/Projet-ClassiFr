@@ -33,14 +33,13 @@
                 </div>
               </div>
               <div class="mt-5 sm:mt-6">
-                    <form class="flex flex-col">
-                        <label for="model_name" class="my-3">Nom</label>
-                        <input type="text" name="Nom du modèle" id="model_name" class="rounded-md border border-gray-300">
-                        <label for="model_name" class="my-3">Accuracy</label>
-                        <input type="text" name="Nom du modèle" id="model_acc" class="rounded-md border border-gray-300">
-                        <label for="model_name" class="my-3">Info</label>
-                        <input type="text" name="Nom du modèle" id="model_info" class="rounded-md border border-gray-300">
-                  
+                <form class="flex flex-col">
+                  <label for="model_name" class="my-3">Nom</label>
+                  <input v-model="model.name" type="text" name="Nom du modèle" id="model_name" class="rounded-md border border-gray-300">
+                  <label for="model_acc" class="my-3">Accuracy</label>
+                  <input v-model="model.accuracy" type="int" name="Accuracy du modèle" id="model_acc" class="rounded-md border border-gray-300">
+                  <label for="model_info" class="my-3">Info</label>
+                  <input v-model="model.info" type="text" name="Info du modèle" id="model_info" class="rounded-md border border-gray-300">
                 </form>
               </div>
             </div>
@@ -69,12 +68,34 @@
   
   <script>
   export default {
+    data(){
+        return {
+            model: {
+                'name':'',
+                'accuracy':0,
+                'info':'',
+                'mod_file':'ffff',
+                'jour':'',
+                'status': false,
+            },
+            models: []
+        }
+    },
     methods: {
-      createModel() {
-        // Code to create a new model goes here
-        // You can access the form fields using Vue's data object
-        this.closeModal();
-      },
+      async createModel(){
+            console.log(this.model);
+            var response = await fetch('http://localhost:8000/api/admin/model/',{
+                method:'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.model)   
+            });
+
+            const newModel = await response.json()
+            console.log(newModel);
+            this.models.push(newModel)
+        },
       toggleModal(){
         document.getElementById('modal').classList.toggle("hidden")
       }

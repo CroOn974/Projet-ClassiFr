@@ -1,6 +1,6 @@
 <template>
   <NavBar></NavBar>
-  <DataTable data = models></DataTable>
+  <DataTable></DataTable>
   <AddModel/>
 </template>
 
