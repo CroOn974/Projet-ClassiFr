@@ -1,6 +1,6 @@
 <template>
 
-      <button type="button" class="bg-gray-800" @click="toggleModal()">Primary</button>
+      <button type="button" class="bg-gray-800 text-white rounded-md px-3 py-1 mt-10" @click="toggleModal()">Ajouter</button>
 
     <div class="hidden flex items-center justify-center" id="modal">
       <div
@@ -24,11 +24,11 @@
             <div>
               <div class="mt-3 text-center sm:mt-5">
                 <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                  Create Model
+                  Ajouter un modèle
                 </h3>
                 <div class="mt-2">
                   <p class="text-sm text-gray-500">
-                    Please fill in the form fields to create a new model.
+                    Veuillez renseigner toutes les informations nécessaire pour l'utilisation du modèle
                   </p>
                 </div>
               </div>
@@ -49,7 +49,7 @@
                 class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 text-base font-medium text-gray-700 m-3"
                 @click="createModel"
               >
-                Create
+                Ajouter
               </button>
 
               <button
@@ -57,7 +57,7 @@
                 class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700"
                 @click="toggleModal"
               >
-                Cancel
+                Annuler
               </button>
             </div>
           </div>
