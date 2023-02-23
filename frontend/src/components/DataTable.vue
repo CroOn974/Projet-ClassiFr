@@ -53,7 +53,7 @@
 
                                 <!-- BOUTOUN DELETE -->
 
-                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" @click="deleteModel(model.id_model)">
                                 Delete
                                 </button>
 
@@ -112,6 +112,10 @@ export default {
         this.models = await response.json();
     },
     methods: {
+        async getModels(){
+            var response = await fetch('http://localhost:8000/api/admin/model');
+            this.models = await response.json();
+        },
         async switch_etat(event) {
             const modelId = event.target.id;
             
@@ -130,18 +134,19 @@ export default {
             const index = this.models.findIndex(m => m.id === updatedModel.id);
             this.models.splice(index, 1, updatedModel);
         },
-        async deleteModel(event){
-            const modelId = event.target.id;
+        async deleteModel(id){
             
-            const model = this.models.find(m => m.id === modelId);
+            const model = this.models.find(m => m.id === id);
             
-            await fetch('http://localhost:8000/api/admin/model/'+ modelId,{
+            await fetch('http://localhost:8000/api/admin/model/'+ id,{
                 method:'delete',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(model)
             });
+
+            await this.getModels();
         },
         toggleChildRow(id) {
             let children = document.getElementsByClassName("child");
