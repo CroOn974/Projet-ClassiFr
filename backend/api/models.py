@@ -35,7 +35,7 @@ class Model(models.Model):
     name = models.CharField(max_length=50)
     mod_file = models.CharField(max_length=255)
     accuracy = models.DecimalField(max_digits=15, decimal_places=4)
-    jour = models.ForeignKey(DateCreate, models.DO_NOTHING, db_column='jour')
+    jour = models.ForeignKey(DateCreate, models.DO_NOTHING, db_column='jour',blank=True, null=True)
     status = models.BooleanField(blank=True, null=True)
     info = models.CharField(max_length=255, blank=True, null=True)
 
