@@ -3,6 +3,7 @@ from api.serializers import ModelSerializer, DateSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from datetime import date
 
 
 class AdminModelViewset(viewsets.ModelViewSet):
@@ -18,6 +19,16 @@ class AdminModelViewset(viewsets.ModelViewSet):
         if status is not None:
             queryset = Model.objects.filter(status = status)
         return queryset
+
+    def perform_create(self, serializer):
+        today = date.today()
+        if DateCreate.objects.filter(jour = today):
+            date = DateCreate.objects.get(jour = today)
+        else:
+            date = DateCreate.objects.create(jour = today)
+
+        serializer.save(jour = date)
+        
 
     # permet de changé le status d'un modèle
     @action(detail=True, methods=['POST'])
