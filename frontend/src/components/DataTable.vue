@@ -59,13 +59,19 @@
 </template>
   
 <script>
-// import { response } from 'express';
 
 export default {
     name : 'DataTable',
     data(){
         return {
-        models: []
+            model: {
+                'name':'',
+                'mod_file':'',
+                'accuracy':'',
+                'status':'',
+                'info':''
+            },
+            models: []
         }
     },
     async created(){
@@ -78,7 +84,6 @@ export default {
             const modelId = event.target.id;
             
             const model = this.models.find(m => m.id === modelId);
-            console.log(model)
 
             var response = await fetch('http://localhost:8000/api/admin/model/'+ modelId +'/etatStatus/',{
                 method:'post',
@@ -92,6 +97,31 @@ export default {
             const updatedModel = await response.json();
             const index = this.models.findIndex(m => m.id === updatedModel.id);
             this.models.splice(index, 1, updatedModel);
+        },
+
+        async createModel(){
+            var response = await fetch('http://localhost:8000/api/admin/model',{
+                method:'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.model)   
+            });
+            this.models.push(await response.json)
+        },
+        
+        async deleteModel(event){
+            const modelId = event.target.id;
+            
+            const model = this.models.find(m => m.id === modelId);
+            
+            await fetch('http://localhost:8000/api/admin/model/'+ modelId,{
+                method:'delete',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(model)
+            });
         }
     }
 };
