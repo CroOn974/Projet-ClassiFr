@@ -95,6 +95,7 @@
             const newModel = await response.json()
             console.log(newModel);
             this.models.push(newModel)
+            document.getElementById('modal').classList.toggle("hidden")
         },
       toggleModal(){
         document.getElementById('modal').classList.toggle("hidden")

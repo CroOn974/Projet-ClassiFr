@@ -10,7 +10,6 @@ import NavBar from './components/NavBar.vue';
   name: 'App',
   components: {
     NavBar,
-
   }
 }
 

@@ -1,9 +1,9 @@
 <template>
-    <nav class="bg-gray-800 w-screen">
+    <nav class="bg-gray-800 w-screen h-20">
       <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
+        <div class="flex justify-between">
           <div class="flex-shrink-0">
-            <a href="/"><img class="h-20 w-20" src="../assets/Classifr_logo.png" alt="Workflow logo"></a> 
+            <a href="/"><img class=" absolute top-0 w-16 mt-3" src="../assets/Classifr_logo.png" alt="Workflow logo"></a> 
           </div>
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
