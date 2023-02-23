@@ -24,7 +24,8 @@ class AdminModelViewset(viewsets.ModelViewSet):
     def etatStatus(self, request, pk):
         model = self.get_object()
         model.etatStatus()
-        return Response({'status': model.status})
+        serializer = self.get_serializer(model)
+        return Response(serializer.data)
 
 
 class ModelViewset(viewsets.ReadOnlyModelViewSet):

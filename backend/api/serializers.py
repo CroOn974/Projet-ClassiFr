@@ -6,7 +6,7 @@ class ModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Model
-        fields = ('name', 'mod_file', 'accuracy', 'jour', 'status', 'info', 'labels')
+        fields = ('id_model','name', 'mod_file', 'accuracy', 'jour', 'status', 'info', 'labels')
 
     def get_labels(self, obj):
         return [associer.libele.libele for associer in obj.associer_set.all()]
