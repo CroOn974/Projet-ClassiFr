@@ -1,16 +1,19 @@
 <template>
   <NavBar></NavBar>
   <DataTable></DataTable>
+  <AddModel/>
 </template>
 
 <script>
 import DataTable from './components/DataTable.vue'
 import NavBar from './components/NavBar.vue';
+import AddModel from './components/AddModel.vue';
 
 export default {
   components:{
     DataTable,
     NavBar,
+    AddModel,
   },
 }
 </script>
