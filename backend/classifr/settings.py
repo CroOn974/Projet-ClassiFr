@@ -50,12 +50,13 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -89,7 +90,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'classifr',
         'USER': 'postgres',
-        'PASSWORD': '0000',
+        'PASSWORD': 'dia974',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -142,5 +143,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
+<<<<<<< HEAD
     'DATE_INPUT_FORMATS': ['%Y-%m-%d']
+=======
+    'DATE_INPUT_FORMATS': ['%Y-%m-%d'],
+>>>>>>> 0bd8421cf2548395532a4b13b1b608e43b6fc8a2
 }

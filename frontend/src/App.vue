@@ -1,21 +1,20 @@
 <template>
-  <div id="app">
-
-  </div>
+  <NavBar></NavBar>
+  <DataTable data = models></DataTable>
 </template>
 
 <script>
+<<<<<<< HEAD
+=======
+import DataTable from './components/DataTable.vue'
+import NavBar from './components/NavBar.vue';
+
+>>>>>>> 0bd8421cf2548395532a4b13b1b608e43b6fc8a2
 export default {
-  name: 'App',
-  data(){
-    return {
-      models: []
-    }
+  components:{
+    DataTable,
+    NavBar,
   },
-  async created(){
-    var response = await fetch('http://localhost:8000/api/admin/model');
-    this.models = await response.json();
-  }
 }
 </script>
 
