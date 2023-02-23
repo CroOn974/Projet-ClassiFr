@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from datetime import date
 
-
+#View destiné au admin
 class AdminModelViewset(viewsets.ModelViewSet):
     
     serializer_class = ModelSerializer
@@ -21,28 +21,12 @@ class AdminModelViewset(viewsets.ModelViewSet):
             queryset = Model.objects.filter(status = status)
         return queryset
 
-    # def perform_create(self, serializer):
-    #     print('ttttt')
-
-    #     print(serializer.validated_data)
-    #     today = date.today()
-        
-    #     if DateCreate.objects.filter(jour = today):
-    #         date = DateCreate.objects.get(jour = today)
-    #     else:
-    #         date = DateCreate.objects.create(jour = today)
-
-    #     name = serializer.validated_name.get('name')
-    #     mod_file = name 
-
-    #     serializer.save(jour = date, mod_file = mod_file)
-
+    # fonction qui permet la création personalisé d'un modèle
     def create(self, request, *args, **kwargs):
         from datetime import date
-        print('rrrrr')
-        print(request)
         today = date.today()
         
+        # verifie si la date existe déjà dans la bdd
         if DateCreate.objects.filter(jour = today):
             date = DateCreate.objects.get(jour = today)
         else:
@@ -74,6 +58,7 @@ class AdminModelViewset(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+# View destiné au client
 class ModelViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Model.objects.filter(status = True)
     serializer_class = ModelSerializer
