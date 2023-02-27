@@ -36,6 +36,46 @@
                 <form class="flex flex-col">
                   <label for="model_name" class="my-3">Nom</label>
                   <input v-model="model.name" type="text" name="Nom du modèle" id="model_name" class="rounded-md border border-gray-300">
+                  <div class="relative inline-block mt-6">
+                    <div x-data="{show: false}">
+                        <button type="button" x-on:click="show = !show" class="inline-flex justify-between w-48 rounded border border-gray-600 px-4 py-2 bg-white text-gray-700 focus:outline-none focus:border-blue-500 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-700 transition duration-150 ease-in-out">
+                    <span class="block truncate">Select Labels</span>
+                    <svg class="w-4 h-4 fill-current flex-shrink-0 ml-2 -mr-1" viewBox="0 0 20 0">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M75 200 L225 200 L150 0 Z" />
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10 1a9 9 0 100 18 9 9 0 000-18zM3.27 10.77a7 7 0 1113.46 0l-1.54 1.16a5 5 0 10-9.38 0l-1.54-1.16z" />
+                    </svg>
+                    </button>
+                        <div x-show="show" x-on:click.away="show = false" class="z-20 mt-2 py-2 w-48 bg-white rounded-md shadow-lg">
+                        <div class="py-1">
+                            <div class="flex items-center ml-2">
+                                <label class="inline-flex items-center">
+                                <input type="checkbox" name="type[]" value="all" class="form-checkbox mr-2" />
+                                <span>Pizza</span>
+                            </label>
+                            </div>
+                            <div class="flex items-center ml-2">
+                                <label class="inline-flex items-center">
+                            <input type="checkbox" name="type[]" value="4x4" class="form-checkbox mr-2" />
+                            <span>Cake</span>
+                            </label>
+                            </div>
+                            <div class="flex items-center ml-2">
+                                <label class="inline-flex items-center">
+                            <input type="checkbox" name="type[]" value="sport" class="form-checkbox mr-2" />
+                            <span>Banane</span>
+                            </label>
+                            </div>
+                            <div class="flex items-center ml-2">
+                                <label class="inline-flex items-center">
+                            <input type="checkbox" name="type[]" value="campers" class="form-checkbox mr-2" />
+                            <span>Orange</span>
+                            </label>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+
                   <label for="model_acc" class="my-3">Accuracy</label>
                   <input v-model="model.accuracy" type="int" name="Accuracy du modèle" id="model_acc" class="rounded-md border border-gray-300">
                   <label for="model_info" class="my-3">Info</label>
@@ -43,6 +83,7 @@
                 </form>
               </div>
             </div>
+            
             <div>
               <button
                 type="button"
@@ -77,11 +118,17 @@
                 'mod_file':'ffff',
                 'jour':'',
                 'status': false,
+                'nimportkoi':[]
             },
             models: []
         }
     },
     methods: {
+
+        async getModels(){
+            var response = await fetch('http://localhost:8000/api/admin/model');
+            this.models = await response.json();
+        },
       async createModel(){
             var response = await fetch('http://localhost:8000/api/admin/model/',{
                 method:'post',
@@ -94,6 +141,8 @@
             const newModel = await response.json()
             this.models.push(newModel)
             document.getElementById('modal').classList.toggle("hidden")
+
+            await this.getModels();
         },
       toggleModal(){
         document.getElementById('modal').classList.toggle("hidden")
