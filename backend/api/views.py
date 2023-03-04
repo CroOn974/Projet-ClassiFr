@@ -59,7 +59,6 @@ class AdminModelViewset(viewsets.ModelViewSet):
         serializer = self.get_serializer(model)
         return Response(serializer.data)
 
-
 # View destiné au client
 class ModelViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Model.objects.filter(status = True)
@@ -73,31 +72,39 @@ class MonitorViewset(viewsets.ModelViewSet):
     # fonction qui permet enregistrer
     def create(self, request, *args, **kwargs):
 
-        date = getToday()
-        
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        my_predict = Predict.objects.create(
-            image=serializer.validated_data['name'],
-            bonne_pred=serializer.validated_data['mod_file'],
-            libele=serializer.validated_data['accuracy'],
-            jour= date,
-            id_model=serializer.validated_data['status'],
-            feedback=serializer.validated_data['info']
-        )
+        print(serializer)
 
-        serializer = self.get_serializer(my_predict)
-        return Response(serializer.data)
+        # date = getToday()
+        
+        # serializer = self.get_serializer(data=request.data)
+        # serializer.is_valid(raise_exception=True)
+
+        # my_predict = Predict.objects.create(
+        #     image=serializer.validated_data['image'],
+        #     bonne_pred=serializer.validated_data['bonne_pred'],
+        #     libele=serializer.validated_data['libele'],
+        #     jour= date,
+        #     id_model=serializer.validated_data['id_model'],
+        #     feedback=serializer.validated_data['feedback']
+        # )
+
+        # serializer = self.get_serializer(my_predict)
+        # return Response(serializer.data)
+        return Response()
 
 # http://localhost:8000/api/predict -> Methode POST, reçois des images et retourn la prédiction
 @api_view(['POST'])
 def Predict(request):
+    # récupère les image et le modèle
     images = request.FILES.getlist('images')
     model = request.POST.get('selectedOption')
+
     results = doPred(images,model)
     response_data = json.dumps(results)
-    print(response_data)
+
     return Response(data=response_data, content_type='application/json')
     
     
@@ -110,13 +117,11 @@ def doPred(images,model):
     for image in images:
         img_norm = norm_img(image)
         predictions = modelPredict.predict(img_norm)
-        print(predictions)
         pred_w_label = addLabelToPredic(predictions, cathegories)
         result = {
             'image': str(image),
             'prediction': pred_w_label
         }
-        print(result)
         results.append(result)
 
     return results
@@ -173,8 +178,6 @@ def getModel(id_model):
 def addLabelToPredic(predictions, categories):
     img_pred = []
 
-    print(predictions)
-    
     for i in range(len(categories)):
         img_pred.append((categories[i], predictions[0][i]))
     # Tri des prédictions par ordre décroissant de probabilité

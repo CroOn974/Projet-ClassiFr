@@ -56,8 +56,8 @@ class Predict(models.Model):
     image = models.CharField(max_length=255)
     bonne_pred = models.BooleanField()
     libele = models.ForeignKey(Label, models.DO_NOTHING, db_column='libele')
-    jour = models.ForeignKey(DateCreate, models.DO_NOTHING, db_column='jour')
-    id_model = models.ForeignKey(Model, models.DO_NOTHING, db_column='id_model')
+    jour = models.ForeignKey(DateCreate, models.DO_NOTHING, db_column='jour', blank=True, null=True)
+    id_model = models.ForeignKey(Model, models.DO_NOTHING, db_column='id_model', blank=True, null=True)
     feedback = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:

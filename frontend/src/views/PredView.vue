@@ -32,10 +32,10 @@
                       <p class="mb-4 text-base text-neutral-600 dark:text-neutral-200">
                         {{ item.prediction.pourcentage }}%
                       </p>
-                      <button type="button" class="inline-block rounded bg-red-500 px-6 pt-2.5 pb-2 mr-4 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-red-600" data-te-ripple-init data-te-ripple-color="light">
+                      <button @click="userFeedback(false,index)" type="button" class="inline-block rounded bg-red-500 px-6 pt-2.5 pb-2 mr-4 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-red-600" data-te-ripple-init data-te-ripple-color="light">
                           KO
                       </button>
-                      <button type="button" class="inline-block rounded bg-green-500 px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-green-600" data-te-ripple-init data-te-ripple-color="light">
+                      <button @click="userFeedback(true,index)" type="button" class="inline-block rounded bg-green-500 px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-green-600" data-te-ripple-init data-te-ripple-color="light">
                           OK
                       </button>
                   </div>
@@ -57,6 +57,14 @@ export default {
       selectedOption: '',
       options: [],
       pret: false,
+      feedback:{
+        image : '',
+        bonne_pred: false,
+        libele : '',
+        jour : '',
+        id_model : '',
+        feedback : '',
+      }
     }
   },
   computed: {
@@ -104,9 +112,7 @@ export default {
       reader.onload = () => {
         this.imageList.push(reader.result);
       };
-      
     }
-
     // Ajoute l'option sélectionnée à l'objet FormData
     formData.append('selectedOption', this.selectedOption);
 
@@ -124,6 +130,38 @@ export default {
     }
     this.pret = true
   },
+  async userFeedback(avis,index){
+
+    let img_pred = this.combinedList[index].image;
+    let label = this.combinedList[index].prediction.label
+    let model = this.selectedOption;
+
+    this.feedback.image = img_pred
+    this.feedback.id_model = model
+    this.feedback.bonne_pred = avis
+    this.feedback.libele = label
+    
+    console.log(JSON.stringify(this.feedback));
+
+    try {
+        // Envoie une requête asynchrone pour prédire les images sélectionnées à l'aide de l'API
+      let response = await fetch('http://localhost:8000/api/monitor/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(this.feedback),
+          })
+          console.log(response.status);
+          console.log(response.statusText);
+          console.log(response.body);
+    } catch (error) {
+      console.log(error);
+    }
+
+
+
+  }
 }
 
 }
