@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from api.views import ModelViewset, AdminModelViewset, MonitorViewset,Predict
+from api.views import ModelViewset, AdminModelViewset, MonitorViewset,PredictImage
 
 model = DefaultRouter()
 model.register('model', ModelViewset, basename= 'Model')
@@ -15,5 +15,5 @@ urlpatterns = [
     path('', include(model.urls)),
     path('', include(monitor.urls)),
     path('', include(admin_model.urls)),
-    path('predict', Predict, name="predict"),
+    path('predict', PredictImage, name="predict"),
 ]

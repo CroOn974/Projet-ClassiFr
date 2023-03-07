@@ -12,6 +12,11 @@ from PIL import Image
 from tensorflow import keras
 import matplotlib as plt
 import numpy as np
+#os
+import os
+import uuid
+import base64
+import io
 
 #View destiné au admin
 class AdminModelViewset(viewsets.ModelViewSet):
@@ -75,29 +80,26 @@ class MonitorViewset(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        print(serializer)
+        date = getToday()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        # date = getToday()
-        
-        # serializer = self.get_serializer(data=request.data)
-        # serializer.is_valid(raise_exception=True)
+        my_predict = Predict.objects.create(
+            image=serializer.validated_data['image_file'],
+            bonne_pred=serializer.validated_data['bonne_pred'],
+            libele=serializer.validated_data['libele'],
+            jour= date,
+            id_model=serializer.validated_data['id_model'],
+            feedback=serializer.validated_data['feedback']
+        )
 
-        # my_predict = Predict.objects.create(
-        #     image=serializer.validated_data['image'],
-        #     bonne_pred=serializer.validated_data['bonne_pred'],
-        #     libele=serializer.validated_data['libele'],
-        #     jour= date,
-        #     id_model=serializer.validated_data['id_model'],
-        #     feedback=serializer.validated_data['feedback']
-        # )
-
-        # serializer = self.get_serializer(my_predict)
-        # return Response(serializer.data)
-        return Response()
+        serializer = self.get_serializer(my_predict)
+        return Response(serializer.data)
+    
 
 # http://localhost:8000/api/predict -> Methode POST, reçois des images et retourn la prédiction
 @api_view(['POST'])
-def Predict(request):
+def PredictImage(request):
     # récupère les image et le modèle
     images = request.FILES.getlist('images')
     model = request.POST.get('selectedOption')
@@ -166,7 +168,7 @@ def getModelFiles(id_model):
     except Model.DoesNotExist:
         return None
 
-# récupère l'object model  
+# récupère l'object model selon l'id
 def getModel(id_model):
     try:
         model = Model.objects.get(id_model=id_model)
@@ -188,3 +190,14 @@ def addLabelToPredic(predictions, categories):
         'pourcentage':img_pred[0][1]*100
     }
     return prediction
+
+
+# def base64_to_image(base64_string):
+    
+#     # Decode the Base64 string to bytes
+#     img_data = base64.b64decode(base64_string.split(',')[1]) # remove the header 'data:image/png;base64'
+#     # Create a BytesIO object from the bytes 
+#     #  and Open the image with PIL and return it
+#     img = Image.open(io.BytesIO(img_data))
+
+#     return img

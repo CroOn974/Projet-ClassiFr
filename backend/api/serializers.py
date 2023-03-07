@@ -17,6 +17,7 @@ class DateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PredictSerializer(serializers.ModelSerializer):
+    image_file = serializers.CharField(required=False)
 
     class Meta:
         model = Predict
