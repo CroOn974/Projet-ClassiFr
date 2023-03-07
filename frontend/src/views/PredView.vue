@@ -21,7 +21,7 @@
       </div>
       <div class="flex flex-wrap">
         <div v-for="(item, index) in combinedList" :key="index" class="m-4">
-              <div class="block w-96 rounded-lg bg-white shadow-lg dark:bg-neutral-700">
+              <div :id="index" class="block w-96 rounded-lg bg-white shadow-lg dark:bg-neutral-700">
                   <a href="#!">
                       <img :src="item.image" alt="Image soumise par l'utilisateur" class="rounded-t-lg h-64 object-cover w-full">
                   </a>
@@ -130,37 +130,35 @@ export default {
     }
     this.pret = true
   },
+  // Feedback sur une image
   async userFeedback(avis,index){
-
+    
     let img_pred = this.combinedList[index].image;
     let label = this.combinedList[index].prediction.label
     let model = this.selectedOption;
 
-    this.feedback.image = img_pred
+    this.feedback.image_file = img_pred
     this.feedback.id_model = model
     this.feedback.bonne_pred = avis
     this.feedback.libele = label
-    
-    console.log(JSON.stringify(this.feedback));
 
     try {
         // Envoie une requête asynchrone pour prédire les images sélectionnées à l'aide de l'API
-      let response = await fetch('http://localhost:8000/api/monitor/', {
-          method: 'POST',
-          headers: {
+      await fetch('http://localhost:8000/api/monitor/', {
+        method: 'POST',
+        headers: {
             'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(this.feedback),
-          })
-          console.log(response.status);
-          console.log(response.statusText);
-          console.log(response.body);
+        },
+        body: JSON.stringify(this.feedback),
+        })
     } catch (error) {
       console.log(error);
     }
 
-
-
+    // enlève élement 
+    const element = document.getElementById(index);
+    element.parentNode.removeChild(element);
+    
   }
 }
 
