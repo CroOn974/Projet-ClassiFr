@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Model, DateCreate, Predict
+from api.models import Model, DateCreate, Predict, Label
 
 class ModelSerializer(serializers.ModelSerializer):
     labels = serializers.SerializerMethodField()
@@ -23,7 +23,9 @@ class PredictSerializer(serializers.ModelSerializer):
         model = Predict
         fields = '__all__'
 
-
-
+class LabelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Label
+        fields = '__all__'
 
         

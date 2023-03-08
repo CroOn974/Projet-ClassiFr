@@ -165,7 +165,8 @@ export default {
                 'status':'',
                 'info':''
             },
-            models: []
+            models: [],
+            
         }
     },
     async created(){

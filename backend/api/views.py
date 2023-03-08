@@ -1,6 +1,6 @@
 import json
-from api.models import Model, DateCreate, Associer, Predict
-from api.serializers import ModelSerializer, PredictSerializer
+from api.models import Model, DateCreate, Associer, Predict, Label
+from api.serializers import ModelSerializer, PredictSerializer, LabelSerializer
 from rest_framework.permissions import IsAuthenticated
 #API
 from rest_framework import viewsets
@@ -10,6 +10,11 @@ from rest_framework.decorators import api_view
 #Pred
 from PIL import Image
 from tensorflow import keras
+from keras.preprocessing.image import ImageDataGenerator
+from keras.applications.mobilenet_v2 import MobileNetV2
+from keras.layers import Dense
+from keras.layers import BatchNormalization
+from keras.models import Model as mod
 import matplotlib as plt
 import numpy as np
 #os
@@ -18,7 +23,7 @@ import uuid
 import base64
 import io
 
-#View destiné au admin
+# View destiné au admin
 class AdminModelViewset(viewsets.ModelViewSet):
     
     serializer_class = ModelSerializer
@@ -45,12 +50,26 @@ class AdminModelViewset(viewsets.ModelViewSet):
         # création de l'objet MyModel
         my_model = Model.objects.create(
             name=serializer.validated_data['name'],
-            mod_file=serializer.validated_data['mod_file'],
+            mod_file=f"model_{my_model.id}",  # concatenation de model_ et l'id généré,
             accuracy=serializer.validated_data['accuracy'],
             jour= date,
-            status=serializer.validated_data['status'],
+            status=False,
             info=serializer.validated_data['info']
         )
+
+        # Lier le nouveau modèle aux libellés correspondants
+        labels = serializer.validated_data.get('labels')
+
+        associer_list = []
+        for label_name in labels:
+            # Récupérer ou créer une instance de Libele en fonction du nom de libellé donné
+            libele, created = Label.objects.get(libele=label_name)
+            associer = Associer(libele=libele, model=my_model)
+            associer_list.append(associer)
+        Associer.objects.bulk_create(associer_list)
+
+        createModel(labels)
+
         # sérialisation et retour de la réponse
         serializer = self.get_serializer(my_model)
         return Response(serializer.data)
@@ -96,6 +115,11 @@ class MonitorViewset(viewsets.ModelViewSet):
         serializer = self.get_serializer(my_predict)
         return Response(serializer.data)
     
+
+class LabelViewset(viewsets.ReadOnlyModelViewSet):
+    queryset = Label.objects.all()
+    serializer_class = LabelSerializer
+
 
 # http://localhost:8000/api/predict -> Methode POST, reçois des images et retourn la prédiction
 @api_view(['POST'])
@@ -201,3 +225,75 @@ def addLabelToPredic(predictions, categories):
 #     img = Image.open(io.BytesIO(img_data))
 
 #     return img
+
+def createModel(label):
+
+    nbLabel = len(label)
+
+    # Define the number of epochs and batch size
+    epochs = 15
+    batch_size = 128
+    image_size = (224,244)
+
+    # Use ImageDataGenerator for data augmentation
+    datagen = ImageDataGenerator(
+        rescale=1./255.0,
+        rotation_range=40,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True,
+        fill_mode='nearest')
+    
+
+    folder = label
+    
+    train_ds = datagen.flow_from_directory(
+    "/dataset/train_set",
+    target_size=image_size,
+    batch_size=batch_size,
+    classes=folder,
+    class_mode='categorical')
+
+    val_ds = datagen.flow_from_directory(
+    "/dataset/test_set",
+    target_size=image_size,
+    batch_size=batch_size,
+    classes=folder,
+    class_mode='categorical')
+
+    # Charger le modèle pré-entraîné
+    # include_top=False , choix de vouloir ou non les couches de décisions
+    baseModel = MobileNetV2(input_shape=(224, 224,3), 
+                            alpha=1.0, 
+                            include_top=False, 
+                            weights='imagenet', 
+                            input_tensor=None, 
+                            pooling='max')
+
+    # Gèle les couches basses du réseau
+    for layer in baseModel.layers:
+        layer.trainable=False
+
+    # Ajoutez une couche de normalisation BatchNormalization après la première couche dense
+    topModel = Dense(4096, activation='relu', trainable=True)(baseModel.output)
+    topModel = BatchNormalization()(topModel)
+    topModel = Dense(nbLabel, activation='sigmoid', trainable=True)(topModel)
+
+    # Compiler le modèle pour la formation
+    mod.compile(optimizer='adam', loss='categorical_hinge', metrics=['accuracy'])
+
+    try:
+    # bloc de code susceptible de lever une exception
+        histo = mod.fit(
+                    train_ds,
+                    epochs=epochs,
+                    validation_data=val_ds,
+        )
+
+        
+    except:
+        print("erreur entrainement du model")
+
+

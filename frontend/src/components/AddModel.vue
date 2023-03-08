@@ -46,14 +46,14 @@
                     </svg>
                     </button>
                         <div x-show="show" x-on:click.away="show = false" class="z-20 mt-2 py-2 w-48 bg-white rounded-md shadow-lg">
-                        <div class="py-1">
+                        <div v-for="(label, index) in labels" :key="index" class="py-1">
                             <div class="flex items-center ml-2">
                                 <label class="inline-flex items-center">
-                                <input type="checkbox" name="type[]" value="all" class="form-checkbox mr-2" />
-                                <span>Pizza</span>
+                                <input type="checkbox" name="type[]" :value="label.libele" class="form-checkbox mr-2" />
+                                <span>{{label.libele}}</span>
                             </label>
                             </div>
-                            <div class="flex items-center ml-2">
+                            <!-- <div class="flex items-center ml-2">
                                 <label class="inline-flex items-center">
                             <input type="checkbox" name="type[]" value="4x4" class="form-checkbox mr-2" />
                             <span>Cake</span>
@@ -70,7 +70,7 @@
                             <input type="checkbox" name="type[]" value="campers" class="form-checkbox mr-2" />
                             <span>Orange</span>
                             </label>
-                            </div>
+                            </div> -->
                         </div>
                         </div>
                     </div>
@@ -120,33 +120,38 @@
                 'status': false,
                 'nimportkoi':[]
             },
-            models: []
-        }
+            models: [], 
+            labels: [], 
+        }   
     },
-    methods: {
-
-        async getModels(){
-            var response = await fetch('http://localhost:8000/api/admin/model');
-            this.models = await response.json();
-        },
+    methods: {    
+    // récupère la liste de tous les labeles
+    async getLabel(){
+      var response = await fetch('http://localhost:8000/api/label');
+      this.labels = await response.json();
+    },
       async createModel(){
-            var response = await fetch('http://localhost:8000/api/admin/model/',{
-                method:'post',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(this.model)   
-            });
+        var response = await fetch('http://localhost:8000/api/admin/model/',{
+            method:'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.model)   
+        });
 
-            const newModel = await response.json()
-            this.models.push(newModel)
-            document.getElementById('modal').classList.toggle("hidden")
+        const newModel = await response.json()
+        this.models.push(newModel)
+        document.getElementById('modal').classList.toggle("hidden")
 
-            await this.getModels();
-        },
+        await this.getModels();
+      },
       toggleModal(){
         document.getElementById('modal').classList.toggle("hidden")
       }
     },
+    mounted(){
+      this.getLabel()
+      console.log(this.labels);
+    }
   };
   </script>
