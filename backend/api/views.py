@@ -1,7 +1,6 @@
 import json
 from api.models import Model, DateCreate, Associer, Predict
-from api.serializers import ModelSerializer, DateSerializer, PredictSerializer
-from datetime import date
+from api.serializers import ModelSerializer, PredictSerializer
 from rest_framework.permissions import IsAuthenticated
 #API
 from rest_framework import viewsets
@@ -29,7 +28,7 @@ class AdminModelViewset(viewsets.ModelViewSet):
     serializer_class = ModelSerializer
 
     def get_queryset(self):
-        print('ttttt')
+        
         # retourne tous les modèles
         queryset = Model.objects.all()
 
@@ -41,14 +40,8 @@ class AdminModelViewset(viewsets.ModelViewSet):
 
     # fonction qui permet la création personalisé d'un modèle
     def create(self, request, *args, **kwargs):
-        from datetime import date
-        today = date.today()
-        
-        # verifie si la date existe déjà dans la bdd
-        if DateCreate.objects.filter(jour = today):
-            date = DateCreate.objects.get(jour = today)
-        else:
-            date = DateCreate.objects.create(jour = today)
+
+        date = getToday()
         
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -75,16 +68,11 @@ class AdminModelViewset(viewsets.ModelViewSet):
         serializer = self.get_serializer(model)
         return Response(serializer.data)
 
-
 # View destiné au client
 class ModelViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Model.objects.filter(status = True)
     serializer_class = ModelSerializer
 
- 
-class DateViewset(viewsets.ModelViewSet):
-    queryset = DateCreate.objects.all()
-    serializer_class = DateSerializer
 
 class UserCreateAPIView(CreateAPIView):
     queryset = User.objects.all()
@@ -115,7 +103,10 @@ class MonitorViewset(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(my_predict)
         return Response(serializer.data)
+    
 
+# http://localhost:8000/api/predict -> Methode POST, reçois des images et retourn la prédiction
+@api_view(['POST'])
 def PredictImage(request):
     # récupère les image et le modèle
     images = request.FILES.getlist('images')
@@ -207,3 +198,14 @@ def addLabelToPredic(predictions, categories):
         'pourcentage':img_pred[0][1]*100
     }
     return prediction
+
+
+# def base64_to_image(base64_string):
+    
+#     # Decode the Base64 string to bytes
+#     img_data = base64.b64decode(base64_string.split(',')[1]) # remove the header 'data:image/png;base64'
+#     # Create a BytesIO object from the bytes 
+#     #  and Open the image with PIL and return it
+#     img = Image.open(io.BytesIO(img_data))
+
+#     return img
