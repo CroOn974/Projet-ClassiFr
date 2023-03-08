@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'authentication',
     'model',
     'predict',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
+
 ]
 
 MIDDLEWARE = [
@@ -143,5 +146,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DATE_INPUT_FORMATS': ['%Y-%m-%d']
+    'DATE_INPUT_FORMATS': ['%Y-%m-%d'],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    )
 }

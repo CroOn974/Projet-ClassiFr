@@ -5,12 +5,12 @@
           <div class="flex-shrink-0">
             <a href="/"><img class="  w-16 mt-2" src="../assets/Classifr_logo.png" alt="Workflow logo"></a> 
           </div>
-          <div class="hidden md:block">
+          <div class="">
             <div class="mt-5 text-lg ml-10 flex items-baseline space-x-4">
-              <a href="#/pred" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Prédiction</a>
-              <a href="#/model" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Modèles</a>
-              <a href="#/monitor" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Monitoring</a>
-              <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+              <router-link class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/pred">Prédiction</router-link>
+              <router-link class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/model">Modèles</router-link>
+              <router-link class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/monitor">Monitoring</router-link>
+              <router-link class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/logout">Log Out</router-link>
             </div>
           </div>
         </div>

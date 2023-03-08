@@ -1,6 +1,6 @@
 <template>
 
-      <button type="button" class="bg-gray-800 text-white rounded-md px-3 py-1 mt-10" @click="toggleModal()">Ajouter</button>
+      <button type="button" class="bg-gray-800 text-white rounded-md px-3 py-1 mt-2 absolute right-24" @click="toggleModal()">Ajouter</button>
 
     <div class="hidden flex items-center justify-center" id="modal">
       <div
@@ -118,7 +118,6 @@
                 'mod_file':'ffff',
                 'jour':'',
                 'status': false,
-                'nimportkoi':[]
             },
             models: []
         }
@@ -141,7 +140,6 @@
             const newModel = await response.json()
             this.models.push(newModel)
             document.getElementById('modal').classList.toggle("hidden")
-
             await this.getModels();
         },
       toggleModal(){

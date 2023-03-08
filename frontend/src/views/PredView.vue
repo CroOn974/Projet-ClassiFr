@@ -1,7 +1,8 @@
 <template>
+  <NavBar/>
 
   <!-- IMAGES FORM  -->
-  <div class="w-96 rounded-lg bg-gray-800 text-slate-50 p-8 mx-auto my-8">
+  <div class="w-min rounded-lg bg-gray-800 text-slate-50 p-8 mx-auto my-8">
     <form @submit.prevent="submitImage">
       <label for="image">Sélectionner des images :</label>
       <input type="file" id="image" ref="image" accept="image/*" multiple required class="my-4">
@@ -10,11 +11,11 @@
   </div>
 
   <!-- Affichage images soumises -->
-  <div v-if="imageDataList.length > 0" class="w-10/12 bg-gray-800 m-auto p-12 my-4 rounded-2xl">
+  <div v-if="imageDataList.length > 0" class="w-11/12 bg-gray-800 m-auto p-12 my-4 rounded-2xl">
       <div class="m-4">
           <h3 class="font-bold text-lg text-slate-50 w-12/12">Récapitulatif des images soumises :</h3>
       </div>
-      <div class="flex flex-wrap">
+      <div class="flex flex-wrap w-10/12 mx-auto justify-center">
           <div v-for="(imageData, index) in imageDataList" :key="index" class="m-4">
               <div class="block w-96 rounded-lg bg-white shadow-lg dark:bg-neutral-700">
                   <a href="#!">
@@ -27,10 +28,10 @@
                       <p class="mb-4 text-base text-neutral-600 dark:text-neutral-200">
                           Taux de confiance
                       </p>
-                      <button type="button" class="inline-block rounded bg-red-500 px-6 pt-2.5 pb-2 mr-4 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-red-600" data-te-ripple-init data-te-ripple-color="light">
+                      <button type="button" class="inline-block rounded bg-red-500 px-6 pt-2.5 pb-2 mr-4 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#FF3636] transition duration-150 ease-in-out hover:bg-red-600" data-te-ripple-init data-te-ripple-color="light">
                           KO
                       </button>
-                      <button type="button" class="inline-block rounded bg-green-500 px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-green-600" data-te-ripple-init data-te-ripple-color="light">
+                      <button type="button" class="inline-block rounded bg-green-500 px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#0f6e00] transition duration-150 ease-in-out hover:bg-green-600" data-te-ripple-init data-te-ripple-color="light">
                           OK
                       </button>
                   </div>
@@ -41,8 +42,12 @@
 </template>
 
 <script>
+import NavBar from '@/components/NavBar.vue'
 export default {
   name:'PredView',
+  components:{
+    NavBar,
+  },
   data() {
     return {
       imageDataList: []

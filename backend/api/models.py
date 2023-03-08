@@ -53,14 +53,13 @@ class Model(models.Model):
 
 class Predict(models.Model):
     id_predict = models.AutoField(primary_key=True)
-    image = models.CharField(max_length=255)
+    image = models.TextField(blank=True, null=True)
     bonne_pred = models.BooleanField()
-    libele = models.ForeignKey(Label, models.DO_NOTHING, db_column='libele')
-    jour = models.ForeignKey(DateCreate, models.DO_NOTHING, db_column='jour')
-    id_model = models.ForeignKey(Model, models.DO_NOTHING, db_column='id_model')
+    libele = models.ForeignKey(Label, models.DO_NOTHING, db_column='libele', blank=True, null=True)
+    jour = models.ForeignKey(DateCreate, models.DO_NOTHING, db_column='jour', blank=True, null=True)
+    id_model = models.ForeignKey(Model, models.DO_NOTHING, db_column='id_model', blank=True, null=True)
     feedback = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'predict'
-
