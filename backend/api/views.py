@@ -1,9 +1,22 @@
-from api.models import Model, DateCreate
-from api.serializers import ModelSerializer, DateSerializer
+import json
+from api.models import Model, DateCreate, Associer, Predict
+from api.serializers import ModelSerializer, PredictSerializer
+from rest_framework.permissions import IsAuthenticated
+#API
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from datetime import date
+from rest_framework.decorators import api_view
+#Pred
+from PIL import Image
+from tensorflow import keras
+import matplotlib as plt
+import numpy as np
+#os
+import os
+import uuid
+import base64
+import io
 
 #View destiné au admin
 class AdminModelViewset(viewsets.ModelViewSet):
@@ -11,7 +24,7 @@ class AdminModelViewset(viewsets.ModelViewSet):
     serializer_class = ModelSerializer
 
     def get_queryset(self):
-        print('ttttt')
+        
         # retourne tous les modèles
         queryset = Model.objects.all()
 
@@ -23,14 +36,8 @@ class AdminModelViewset(viewsets.ModelViewSet):
 
     # fonction qui permet la création personalisé d'un modèle
     def create(self, request, *args, **kwargs):
-        from datetime import date
-        today = date.today()
-        
-        # verifie si la date existe déjà dans la bdd
-        if DateCreate.objects.filter(jour = today):
-            date = DateCreate.objects.get(jour = today)
-        else:
-            date = DateCreate.objects.create(jour = today)
+
+        date = getToday()
         
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -57,13 +64,140 @@ class AdminModelViewset(viewsets.ModelViewSet):
         serializer = self.get_serializer(model)
         return Response(serializer.data)
 
-
 # View destiné au client
 class ModelViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Model.objects.filter(status = True)
     serializer_class = ModelSerializer
 
- 
-class DateViewset(viewsets.ModelViewSet):
-    queryset = DateCreate.objects.all()
-    serializer_class = DateSerializer
+
+class MonitorViewset(viewsets.ModelViewSet):
+    queryset = Predict.objects.all()
+    serializer_class = PredictSerializer
+
+    # fonction qui permet enregistrer
+    def create(self, request, *args, **kwargs):
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        date = getToday()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        my_predict = Predict.objects.create(
+            image=serializer.validated_data['image_file'],
+            bonne_pred=serializer.validated_data['bonne_pred'],
+            libele=serializer.validated_data['libele'],
+            jour= date,
+            id_model=serializer.validated_data['id_model'],
+            feedback=serializer.validated_data['feedback']
+        )
+
+        serializer = self.get_serializer(my_predict)
+        return Response(serializer.data)
+    
+
+# http://localhost:8000/api/predict -> Methode POST, reçois des images et retourn la prédiction
+@api_view(['POST'])
+def PredictImage(request):
+    # récupère les image et le modèle
+    images = request.FILES.getlist('images')
+    model = request.POST.get('selectedOption')
+
+    results = doPred(images,model)
+    response_data = json.dumps(results)
+
+    return Response(data=response_data, content_type='application/json')
+    
+    
+def doPred(images,model):
+    results = []
+    modelFile = getModelFiles(model)
+    cathegories = getCategories(model)
+    modelPredict = keras.models.load_model("api/modelPred/"+modelFile+".keras")
+    
+    for image in images:
+        img_norm = norm_img(image)
+        predictions = modelPredict.predict(img_norm)
+        pred_w_label = addLabelToPredic(predictions, cathegories)
+        result = {
+            'image': str(image),
+            'prediction': pred_w_label
+        }
+        results.append(result)
+
+    return results
+
+# normalise les images
+def norm_img(img_file):
+    img = Image.open(img_file)
+    img = img.convert("RGB")
+    img = img.resize((224, 224))
+    img_array = np.array(img) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
+    return img_array
+
+# récupère la date
+def getToday():
+    from datetime import date
+    today = date.today()
+
+    # verifie si la date existe déjà dans la bdd
+    if DateCreate.objects.filter(jour = today):
+        # si elle existe la récupère
+        date = DateCreate.objects.get(jour = today)
+    else:
+        # si elle existe pas la crée
+        date = DateCreate.objects.create(jour = today)
+
+    return date
+
+# obtenir les catégories à partir de l'emplacement de répertoire
+def getCategories(id):
+    try:
+        labels = Associer.objects.filter(id_model=id).values_list('libele__libele', flat=True).order_by('libele__libele')
+        return labels
+    except Model.DoesNotExist:
+        return None
+
+# retourne l'emplacement du fichier
+def getModelFiles(id_model):
+    try:
+        model = Model.objects.get(id_model=id_model)
+        return model.mod_file
+    except Model.DoesNotExist:
+        return None
+
+# récupère l'object model selon l'id
+def getModel(id_model):
+    try:
+        model = Model.objects.get(id_model=id_model)
+        return model
+    except Model.DoesNotExist:
+        return None
+
+# Associer les prédiction au label
+def addLabelToPredic(predictions, categories):
+    img_pred = []
+
+    for i in range(len(categories)):
+        img_pred.append((categories[i], predictions[0][i]))
+    # Tri des prédictions par ordre décroissant de probabilité
+    img_pred.sort(key=lambda x: x[1], reverse=True)
+    # Récupération de la catégorie avec la plus haute probabilité
+    prediction = {
+        'label':img_pred[0][0],
+        'pourcentage':img_pred[0][1]*100
+    }
+    return prediction
+
+
+# def base64_to_image(base64_string):
+    
+#     # Decode the Base64 string to bytes
+#     img_data = base64.b64decode(base64_string.split(',')[1]) # remove the header 'data:image/png;base64'
+#     # Create a BytesIO object from the bytes 
+#     #  and Open the image with PIL and return it
+#     img = Image.open(io.BytesIO(img_data))
+
+#     return img
