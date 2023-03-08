@@ -1,7 +1,8 @@
 <template>
+  <NavBar/>
 
   <!-- IMAGES FORM  -->
-  <div class="w-96 rounded-lg bg-gray-800 text-slate-50 p-8 mx-auto my-8">
+  <div class="w-min rounded-lg bg-gray-800 text-slate-50 p-8 mx-auto my-8">
     <form @submit.prevent="submitImage">
       <label for="select-option">Sélectionnez une option :</label>
         <select class="text-black my-4 form-select block w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline" id="select-option" v-model="selectedOption">
@@ -19,7 +20,7 @@
       <div class="m-4">
           <h3 class="font-bold text-lg text-slate-50 w-12/12">Récapitulatif des images soumises :</h3>
       </div>
-      <div class="flex flex-wrap">
+      <div class="flex flex-wrap w-10/12 mx-auto justify-center">
         <div v-for="(item, index) in combinedList" :key="index" class="m-4">
               <div :id="index" class="block w-96 rounded-lg bg-white shadow-lg dark:bg-neutral-700">
                   <a href="#!">
@@ -46,9 +47,12 @@
 </template>
 
 <script>
-// Définit un composant Vue appelé "PredView"
+import NavBar from '@/components/NavBar.vue'
 export default {
   name:'PredView',
+  components:{
+    NavBar,
+  },
   data() {
     return {
       // Initialise les données du composant avec des tableaux vides et des chaînes de caractères vides

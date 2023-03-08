@@ -43,6 +43,10 @@ INSTALLED_APPS = [
     #my app
     'api',
     'authentication',
+    'model',
+    'predict',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
 
 ]
 
@@ -89,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'classifr',
         'USER': 'postgres',
-        'PASSWORD': '0000',
+        'PASSWORD': 'dia974',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -142,5 +146,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DATE_INPUT_FORMATS': ['%Y-%m-%d']
+    'DATE_INPUT_FORMATS': ['%Y-%m-%d'],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    )
 }

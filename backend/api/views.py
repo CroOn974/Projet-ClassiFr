@@ -7,6 +7,10 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+#User Login
+from rest_framework.generics import CreateAPIView
+from django.contrib.auth.models import User
+from .serializers import UserSerializer
 #Pred
 from PIL import Image
 from tensorflow import keras
@@ -69,6 +73,10 @@ class ModelViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Model.objects.filter(status = True)
     serializer_class = ModelSerializer
 
+
+class UserCreateAPIView(CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 class MonitorViewset(viewsets.ModelViewSet):
     queryset = Predict.objects.all()
