@@ -2,6 +2,17 @@ from rest_framework import serializers
 from api.models import Model, DateCreate, Predict, Label
 from django.contrib.auth.models import User
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    is_super_user = serializers.BooleanField(source='user.is_superuser')
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        # Ajouter le nom d'utilisateur et le statut d'administrateur dans les données retournées
+        data['is_super_user'] = self.user.is_superuser
+        return data
+
+
 class ModelSerializer(serializers.ModelSerializer):
     labels = serializers.SerializerMethodField()
 
@@ -18,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'password')
+        fields = '__all__' #('username', 'password','is_superuser','id')
 
     def create(self, validated_data):
         user = User.objects.create_user(

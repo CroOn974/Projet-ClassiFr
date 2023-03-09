@@ -1,6 +1,6 @@
 <template>
   <NavBar/>
-  <MonitorTable/>
+  <MonitorTable v-if="isSuperUser"/>
 </template>
 
 <script>
@@ -11,6 +11,11 @@ name: 'MonitorView',
 components: {
   MonitorTable,
   NavBar,
-}
+},
+  data(){
+    return{
+      isSuperUser : this.$store.state.isSuperUser,
+    }
+  },
 }
 </script>

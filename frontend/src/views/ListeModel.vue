@@ -1,7 +1,8 @@
 <template>
   <NavBar/>
-  <AddModel/>
-  <div class="home">
+  
+  <div v-if="isSuperUser" class="home">
+    <AddModel/>
     <DataTable/>
   </div>
   
@@ -34,6 +35,10 @@ export default {
         });
     }
   },
-
+  data(){
+    return{
+      isSuperUser : this.$store.state.isSuperUser,
+    }
+  },
 }
 </script>

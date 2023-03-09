@@ -20,9 +20,9 @@
       <div class="m-4">
           <h3 class="font-bold text-lg text-slate-50 w-12/12">Récapitulatif des images soumises :</h3>
       </div>
-      <div class="flex flex-wrap w-10/12 mx-auto justify-center">
-        <div v-for="(item, index) in combinedList" :key="index" class="m-4">
-              <div :id="index" class="block w-96 rounded-lg bg-white shadow-lg dark:bg-neutral-700">
+      <div class="flex flex-wrap mx-auto justify-center">
+        <div :id="index" v-for="(item, index) in combinedList" :key="index" class="m-4">
+              <div class="block w-96 rounded-lg bg-white shadow-lg dark:bg-neutral-700">
                   <a href="#!">
                       <img :src="item.image" alt="Image soumise par l'utilisateur" class="rounded-t-lg h-64 object-cover w-full">
                   </a>
