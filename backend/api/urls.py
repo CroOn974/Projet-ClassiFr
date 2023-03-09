@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from api.views import ModelViewset, AdminModelViewset, UserCreateAPIView, MonitorViewset,PredictImage
+from api.views import ModelViewset, AdminModelViewset, UserCreateAPIView, MonitorViewset,PredictImage, UserDetailView, CustomTokenObtainPairView
 from rest_framework_simplejwt.views import (TokenObtainPairView,TokenRefreshView)
 
 model = DefaultRouter()
@@ -12,14 +12,15 @@ admin_model.register('admin/model', AdminModelViewset, basename= 'Model')
 monitor = DefaultRouter()
 monitor.register('monitor',MonitorViewset, basename= "monitor")
 
-monitor = DefaultRouter()
-monitor.register('monitor',MonitorViewset, basename= "monitor")
+user = DefaultRouter()
+user.register('user',UserDetailView, basename= "user")
 
 
 urlpatterns = [
     path('signup/', UserCreateAPIView.as_view(), name='user_create'),
-    path('api-token/', TokenObtainPairView.as_view()),
+    path('api-token/', CustomTokenObtainPairView.as_view()),
     path('api-token-refresh/', TokenRefreshView.as_view()),
+    path('', include(user.urls)),
     path('', include(model.urls)),
     path('', include(monitor.urls)),
     path('', include(admin_model.urls)),

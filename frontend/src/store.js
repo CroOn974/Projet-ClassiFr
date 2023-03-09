@@ -12,22 +12,26 @@ export default createStore({
         return {
             accessToken: null,
             refreshToken: null,
-            APIData: ''
+            APIData: '',
+            isSuperUser: false
         }
     },
     mutations: {
-        updateStorage(state, { access, refresh }) {
+        updateStorage(state, { access, refresh ,isSuperUser}) {
           state.accessToken = access;
           state.refreshToken = refresh;
+          state.isSuperUser = isSuperUser;
         },
         destroyToken(state) {
           state.accessToken = null;
           state.refreshToken = null;
+          state.isSuperUser = false;
         },
-        storeUserData(state, { access, refresh }) {
+        storeUserData(state, { access, refresh, isSuperUser }) {
           state.accessToken = access;
           state.refreshToken = refresh;
-        }
+          state.isSuperUser = isSuperUser;
+        },
       },
       getters: {
         loggedIn(state) {
@@ -43,11 +47,13 @@ export default createStore({
         userLogin(context, usercredentials) {
           return new Promise((resolve, reject) => {
             getAPI.post('api/api-token/', {
+              is_super_user: false,
               username: usercredentials.username,
               password: usercredentials.password
             })
             .then(response => {
-              context.commit('updateStorage', { access: response.data.access, refresh: response.data.refresh });
+              console.log(response.data.is_super_user);
+              context.commit('updateStorage', { access: response.data.access, refresh: response.data.refresh, isSuperUser: response.data.is_super_user });
               resolve();
             })
             .catch(err => {
@@ -63,7 +69,7 @@ export default createStore({
               })
               .then(response => {
                 // Store User signin  data 
-                context.commit('storeUserData', { access: response.data.access, refresh: response.data.refresh });
+                context.commit('storeUserData', { access: response.data.access, refresh: response.data.refresh, isSuperUser: response.data.is_super_user  });
                 resolve(response.data);
               })
               .catch(err => {

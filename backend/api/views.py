@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 #User Login
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from django.contrib.auth.models import User
 from .serializers import UserSerializer
 #Pred
@@ -21,6 +21,12 @@ import os
 import uuid
 import base64
 import io
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 #View destiné au admin
 class AdminModelViewset(viewsets.ModelViewSet):
@@ -73,6 +79,9 @@ class ModelViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Model.objects.filter(status = True)
     serializer_class = ModelSerializer
 
+class UserDetailView(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 class UserCreateAPIView(CreateAPIView):
     queryset = User.objects.all()
@@ -102,6 +111,14 @@ class MonitorViewset(viewsets.ModelViewSet):
         )
 
         serializer = self.get_serializer(my_predict)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['patch'])
+    def update_feedback(self, request, pk=None):
+        predict = self.get_object()
+        predict.feedback = request.data.get('feedback', predict.feedback)
+        predict.save()
+        serializer = self.get_serializer(predict)
         return Response(serializer.data)
     
 
