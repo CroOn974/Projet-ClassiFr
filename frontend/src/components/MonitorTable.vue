@@ -3,7 +3,9 @@
     <div class="flex flex-col w-auto mx-24 mt-10">
       <div class="flex justify-end mb-4">
         <label class="mr-2">Filtrer par id_modele:</label>
-        <input type="text" v-model="filterBy" class="border rounded-md px-2 py-1">
+        <select v-model="filterBy" @change="test()" class="border rounded-md px-2 py-1">
+          <option v-for="model in modelList" :key="model.id_model" value="model.id_model">{{ model.id_model }}</option>
+        </select>
       </div>
       <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
@@ -17,12 +19,24 @@
                   <th scope="col" class="px-6 py-4">FeedBack</th>
                 </tr>
               </thead>
-              <tbody v-for="predict in predictions" :key="predict.id_predict">
+              <tbody v-for="predict in filteredPredictions" :key="predict.id_predict">
                 <tr class="border-b dark:border-neutral-500">
                   <td class="whitespace-nowrap px-6 py-4">{{ predict.image }}</td>
                   <td class="whitespace-nowrap px-6 py-4">{{ predict.libele }}</td>
                   <td class="whitespace-nowrap px-6 py-4">{{ predict.bonne_pred }}</td>
-                  <td class="whitespace-nowrap px-6 py-4">{{ predict.feedback }}</td>
+                  <td class="whitespace-nowrap px-6 py-4 flex center">
+                    <textarea 
+                      type="textarea" 
+                      name="feedback" 
+                      id="feedback" 
+                      v-model = "predict.feedback"
+                      class="border w-8/12 rounded-md h-24 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent overflow-auto"
+                    ></textarea>
+                    <div class="m-auto">
+                      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" @click="saveFeedback(predict)">Envoyer</button>
+                    </div>
+                    
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -44,21 +58,53 @@
           feedback: "",
           id_modele: "",
         },
+        model:{
+          id_model:"",
+        },
+        modelList: [],
         predictions: [],
-        filterBy: "",
+        filterBy: "0",
       };
     },
     async created() {
       var response = await fetch("http://localhost:8000/api/monitor");
       this.predictions = await response.json();
+
+      var models = await fetch("http://localhost:8000/api/admin/model");
+      this.modelList = await models.json()
+      console.log(this.modelList);
+    },
+    methods: {
+      async saveFeedback(predict) {
+        const response = await fetch(`http://localhost:8000/api/monitor/${predict.id_predict}`+'/', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ feedback: predict.feedback }),
+        });
+        if (response.ok) {
+          console.log('Feedback saved successfully!');
+        } else {
+          console.error('Error saving feedback:', response.status);
+        }
+      },
+      test(){
+        this.filteredPredictions;
+        console.log(this.filteredPredictions)
+      }
     },
     computed: {
       filteredPredictions() {
-        return this.predictions.filter(
-          (predict) =>
-            predict.id_modele.toString().indexOf(this.filterBy.toLowerCase()) !== -1
-        );
+        if (!this.filterBy) {
+          // Si aucune option n'est sélectionnée, affiche toutes les prédictions
+          return this.predictions;
+        } else {
+          // Sinon, filtre les prédictions par id_model correspondant à l'option sélectionnée
+          console.log(this.predictions.filter(prediction => prediction.id_modele === this.filterBy));
+          return this.predictions.filter(prediction => prediction.id_modele === this.filterBy);
+        }
       },
     },
-  };
-  </script>
+};
+</script>

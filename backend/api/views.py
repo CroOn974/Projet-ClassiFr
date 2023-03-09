@@ -79,7 +79,7 @@ class ModelViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Model.objects.filter(status = True)
     serializer_class = ModelSerializer
 
-class UserDetailView(RetrieveAPIView):
+class UserDetailView(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -111,6 +111,14 @@ class MonitorViewset(viewsets.ModelViewSet):
         )
 
         serializer = self.get_serializer(my_predict)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['patch'])
+    def update_feedback(self, request, pk=None):
+        predict = self.get_object()
+        predict.feedback = request.data.get('feedback', predict.feedback)
+        predict.save()
+        serializer = self.get_serializer(predict)
         return Response(serializer.data)
     
 

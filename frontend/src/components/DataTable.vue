@@ -241,7 +241,6 @@ export default {
                 body: JSON.stringify(model)
             });
 
-
             const updatedModel = await response.json();
             const index = this.models.findIndex(m => m.id === updatedModel.id);
             this.models.splice(index, 1, updatedModel);

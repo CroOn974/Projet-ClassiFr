@@ -12,13 +12,15 @@ admin_model.register('admin/model', AdminModelViewset, basename= 'Model')
 monitor = DefaultRouter()
 monitor.register('monitor',MonitorViewset, basename= "monitor")
 
+user = DefaultRouter()
+user.register('user',UserDetailView, basename= "user")
+
 
 urlpatterns = [
     path('signup/', UserCreateAPIView.as_view(), name='user_create'),
     path('api-token/', CustomTokenObtainPairView.as_view()),
     path('api-token-refresh/', TokenRefreshView.as_view()),
-    path('user/<int:pk>/', UserDetailView.as_view(), name='user_detail'),
-
+    path('', include(user.urls)),
     path('', include(model.urls)),
     path('', include(monitor.urls)),
     path('', include(admin_model.urls)),
