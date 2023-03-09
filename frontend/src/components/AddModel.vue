@@ -1,6 +1,6 @@
 <template>
 
-      <button type="button" class="bg-gray-800 text-white rounded-md px-3 py-1 mt-10" @click="toggleModal()">Ajouter</button>
+      <button type="button" class="bg-gray-800 text-white rounded-md px-3 py-1 mt-2 absolute right-24" @click="toggleModal()">Ajouter</button>
 
     <div class="hidden flex items-center justify-center" id="modal">
       <div
@@ -39,12 +39,12 @@
                   <div class="relative inline-block mt-6">
                     <div x-data="{show: false}">
                         <button type="button" x-on:click="show = !show" class="inline-flex justify-between w-48 rounded border border-gray-600 px-4 py-2 bg-white text-gray-700 focus:outline-none focus:border-blue-500 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-700 transition duration-150 ease-in-out">
-                    <span class="block truncate">Select Labels</span>
-                    <svg class="w-4 h-4 fill-current flex-shrink-0 ml-2 -mr-1" viewBox="0 0 20 0">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M75 200 L225 200 L150 0 Z" />
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10 1a9 9 0 100 18 9 9 0 000-18zM3.27 10.77a7 7 0 1113.46 0l-1.54 1.16a5 5 0 10-9.38 0l-1.54-1.16z" />
-                    </svg>
-                    </button>
+                        <span class="block truncate">Select Labels</span>
+                        <svg class="w-4 h-4 fill-current flex-shrink-0 ml-2 -mr-1" viewBox="0 0 20 0">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M75 200 L225 200 L150 0 Z" />
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 1a9 9 0 100 18 9 9 0 000-18zM3.27 10.77a7 7 0 1113.46 0l-1.54 1.16a5 5 0 10-9.38 0l-1.54-1.16z" />
+                        </svg>
+                        </button>
                         <div x-show="show" x-on:click.away="show = false" class="z-20 mt-2 py-2 w-48 bg-white rounded-md shadow-lg">
                         <div v-for="(label, index) in labels" :key="index" class="py-1">
                             <div class="flex items-center ml-2">
@@ -53,33 +53,10 @@
                                 <span>{{label.libele}}</span>
                             </label>
                             </div>
-                            <!-- <div class="flex items-center ml-2">
-                                <label class="inline-flex items-center">
-                            <input type="checkbox" name="type[]" value="4x4" class="form-checkbox mr-2" />
-                            <span>Cake</span>
-                            </label>
-                            </div>
-                            <div class="flex items-center ml-2">
-                                <label class="inline-flex items-center">
-                            <input type="checkbox" name="type[]" value="sport" class="form-checkbox mr-2" />
-                            <span>Banane</span>
-                            </label>
-                            </div>
-                            <div class="flex items-center ml-2">
-                                <label class="inline-flex items-center">
-                            <input type="checkbox" name="type[]" value="campers" class="form-checkbox mr-2" />
-                            <span>Orange</span>
-                            </label>
-                            </div> -->
                         </div>
                         </div>
                     </div>
-                    </div>
-
-                  <label for="model_acc" class="my-3">Accuracy</label>
-                  <input v-model="model.accuracy" type="int" name="Accuracy du modèle" id="model_acc" class="rounded-md border border-gray-300">
-                  <label for="model_info" class="my-3">Info</label>
-                  <input v-model="model.info" type="text" name="Info du modèle" id="model_info" class="rounded-md border border-gray-300">
+                  </div>
                 </form>
               </div>
             </div>
@@ -113,12 +90,12 @@
         return {
             model: {
                 'name':'',
+                'mod_file':'aucun',
                 'accuracy':0,
-                'info':'',
-                'mod_file':'ffff',
                 'jour':'',
                 'status': false,
-                'nimportkoi':[]
+                'info':'',
+                'labels': [],
             },
             models: [], 
             labels: [], 
@@ -130,20 +107,27 @@
       var response = await fetch('http://localhost:8000/api/label');
       this.labels = await response.json();
     },
-      async createModel(){
-        var response = await fetch('http://localhost:8000/api/admin/model/',{
-            method:'post',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(this.model)   
-        });
+    // permet de crée un model
+    async createModel(){
+      const checkboxes = document.querySelectorAll('input[name="type[]"]:checked');
+      const selectedLabels = Array.from(checkboxes).map(cb => cb.value);
+      this.model.labels = selectedLabels
 
-        const newModel = await response.json()
-        this.models.push(newModel)
-        document.getElementById('modal').classList.toggle("hidden")
+      console.log(this.model);
 
-        await this.getModels();
+      var response = await fetch('http://localhost:8000/api/admin/model/',{
+          method:'post',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(this.model)   
+      });
+
+      const newModel = await response.json()
+      this.models.push(newModel)
+      document.getElementById('modal').classList.toggle("hidden")
+
+      await this.getModels();
       },
       toggleModal(){
         document.getElementById('modal').classList.toggle("hidden")

@@ -1,4 +1,5 @@
 import json
+from django.shortcuts import get_object_or_404
 from api.models import Model, DateCreate, Associer, Predict, Label
 from api.serializers import ModelSerializer, PredictSerializer, LabelSerializer
 from rest_framework.permissions import IsAuthenticated
@@ -6,7 +7,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.decorators import api_view
+#User Login
+from rest_framework.generics import CreateAPIView
+from django.contrib.auth.models import User
+from .serializers import UserSerializer
 #Pred
 from PIL import Image
 from tensorflow import keras
@@ -22,6 +28,7 @@ import os
 import uuid
 import base64
 import io
+
 
 # View destiné au admin
 class AdminModelViewset(viewsets.ModelViewSet):
@@ -39,40 +46,38 @@ class AdminModelViewset(viewsets.ModelViewSet):
             queryset = Model.objects.filter(status = status)
         return queryset
 
-    # fonction qui permet la création personalisé d'un modèle
     def create(self, request, *args, **kwargs):
+            data = request.data.copy()
+            data['jour'] = getToday()
 
-        date = getToday()
-        
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+            labels_list = data['labels']
 
-        # création de l'objet MyModel
-        my_model = Model.objects.create(
-            name=serializer.validated_data['name'],
-            mod_file=f"model_{my_model.id}",  # concatenation de model_ et l'id généré,
-            accuracy=serializer.validated_data['accuracy'],
-            jour= date,
-            status=False,
-            info=serializer.validated_data['info']
-        )
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
 
-        # Lier le nouveau modèle aux libellés correspondants
-        labels = serializer.validated_data.get('labels')
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
 
-        associer_list = []
-        for label_name in labels:
-            # Récupérer ou créer une instance de Libele en fonction du nom de libellé donné
-            libele, created = Label.objects.get(libele=label_name)
-            associer = Associer(libele=libele, model=my_model)
-            associer_list.append(associer)
-        Associer.objects.bulk_create(associer_list)
+            instance = serializer.instance
+            newModelId = instance.id_model
 
-        createModel(labels)
+            associer_list = []
+            for label_name in labels_list:
+                # Récupérer ou créer une instance de Label en fonction du nom de libellé donné
+                label, created = Label.objects.get_or_create(libele=label_name)
+                associer = Associer(libele=label, id_model=instance)
+                associer_list.append(associer)
+            Associer.objects.bulk_create(associer_list)
 
-        # sérialisation et retour de la réponse
-        serializer = self.get_serializer(my_model)
-        return Response(serializer.data)
+            accuracy = createModel(labels_list,newModelId)
+
+            mod_file = 'model_{}'.format(newModelId)
+                # Mettre à jour le champ mod_file du modèle créé
+            instance.mod_file = mod_file
+            instance.accuracy = accuracy
+            instance.save()
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         
 
     # permet de changé le status d'un modèle
@@ -83,11 +88,27 @@ class AdminModelViewset(viewsets.ModelViewSet):
         serializer = self.get_serializer(model)
         return Response(serializer.data)
 
+
+    @action(detail=True, methods=['GET'])
+    def updateInfo(self, request, pk=None):
+        # récupérer le modèle spécifié par l'ID
+        model = get_object_or_404(Predict, id=pk)
+        # récupérer toutes les prédictions associées à ce modèle
+        predictions = Predict.objects.filter(id_model=model)
+        # sérialiser les prédictions
+        serializer = PredictSerializer(predictions, many=True)
+        # renvoyer les prédictions sérialisées en réponse
+        return Response(serializer.data)
+    
+
 # View destiné au client
 class ModelViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Model.objects.filter(status = True)
     serializer_class = ModelSerializer
 
+class UserCreateAPIView(CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 class MonitorViewset(viewsets.ModelViewSet):
     queryset = Predict.objects.all()
@@ -115,7 +136,15 @@ class MonitorViewset(viewsets.ModelViewSet):
         serializer = self.get_serializer(my_predict)
         return Response(serializer.data)
     
-
+        # permet de changé le status d'un modèle
+    
+    @action(detail=True, methods=['POST'])
+    def moniModel(self, request, pk):
+        monitor = self.get_object()
+        model.etatStatus()
+        serializer = self.get_serializer(model)
+        return Response(serializer.dat)
+    
 class LabelViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Label.objects.all()
     serializer_class = LabelSerializer
@@ -174,7 +203,7 @@ def getToday():
         # si elle existe pas la crée
         date = DateCreate.objects.create(jour = today)
 
-    return date
+    return today
 
 # obtenir les catégories à partir de l'emplacement de répertoire
 def getCategories(id):
@@ -215,23 +244,13 @@ def addLabelToPredic(predictions, categories):
     }
     return prediction
 
+# création du modèles de prediction
+def createModel(labels_list, newModelId):
 
-# def base64_to_image(base64_string):
-    
-#     # Decode the Base64 string to bytes
-#     img_data = base64.b64decode(base64_string.split(',')[1]) # remove the header 'data:image/png;base64'
-#     # Create a BytesIO object from the bytes 
-#     #  and Open the image with PIL and return it
-#     img = Image.open(io.BytesIO(img_data))
-
-#     return img
-
-def createModel(label):
-
-    nbLabel = len(label)
+    nbLabel = len(labels_list)
 
     # Define the number of epochs and batch size
-    epochs = 15
+    epochs = 5
     batch_size = 128
     image_size = (224,244)
 
@@ -247,17 +266,17 @@ def createModel(label):
         fill_mode='nearest')
     
 
-    folder = label
-    
+    folder = labels_list
+
     train_ds = datagen.flow_from_directory(
-    "/dataset/train_set",
+    "api/dataset/train_set",
     target_size=image_size,
     batch_size=batch_size,
     classes=folder,
     class_mode='categorical')
 
     val_ds = datagen.flow_from_directory(
-    "/dataset/test_set",
+    "api/dataset/test_set/",
     target_size=image_size,
     batch_size=batch_size,
     classes=folder,
@@ -281,19 +300,28 @@ def createModel(label):
     topModel = BatchNormalization()(topModel)
     topModel = Dense(nbLabel, activation='sigmoid', trainable=True)(topModel)
 
+    newmod = mod(inputs=baseModel.input, outputs=topModel)
     # Compiler le modèle pour la formation
-    mod.compile(optimizer='adam', loss='categorical_hinge', metrics=['accuracy'])
+    newmod.compile(optimizer='adam', loss='categorical_hinge', metrics=['accuracy'])
 
     try:
     # bloc de code susceptible de lever une exception
-        histo = mod.fit(
+        newModel = newmod.fit(
                     train_ds,
                     epochs=epochs,
                     validation_data=val_ds,
         )
 
-        
+   
     except:
         print("erreur entrainement du model")
+
+    # Sauvegarde du modèle
+    mod_file = f"api/modelPred/model_{newModelId}.keras"
+    newmod.save(mod_file, save_format="h5")
+
+    accuracy = newModel.history['accuracy'][epochs - 1]
+
+    return accuracy
 
 

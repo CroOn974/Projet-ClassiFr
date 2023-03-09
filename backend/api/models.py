@@ -5,7 +5,7 @@ from django.db import models
 
 class Associer(models.Model):
     id_associer = models.AutoField(primary_key=True)
-    id_model = models.ForeignKey('Model', models.DO_NOTHING, db_column='id_model', blank=True, null=True)
+    id_model = models.ForeignKey('Model', on_delete=models.CASCADE, db_column='id_model', blank=True, null=True)
     libele = models.ForeignKey('Label', models.DO_NOTHING, db_column='libele', blank=True, null=True)
 
     class Meta:
@@ -63,4 +63,3 @@ class Predict(models.Model):
     class Meta:
         managed = False
         db_table = 'predict'
-
