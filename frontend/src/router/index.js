@@ -53,7 +53,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const isAuthenticated = store.getters.loggedIn;
-
+  console.log();
   if (requiresAuth && !isAuthenticated) {
     next('/login');
   } else {

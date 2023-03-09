@@ -1,7 +1,8 @@
 <template>
   <NavBar/>
-  <AddModel/>
-  <div class="home">
+  
+  <div v-if="isSuperUser" class="home">
+    <AddModel/>
     <DataTable/>
   </div>
   
@@ -34,11 +35,10 @@ export default {
         });
     }
   },
-  mounted() {
-    // appel de la méthode fetchData() toutes les 5 secondes
-    // setInterval(() => {
-    //   this.fetchData();
-    // }, 5000);
-  }
+  data(){
+    return{
+      isSuperUser : this.$store.state.isSuperUser,
+    }
+  },
 }
 </script>

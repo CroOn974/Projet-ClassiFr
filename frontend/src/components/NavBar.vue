@@ -8,8 +8,8 @@
           <div class="">
             <div class="mt-5 text-lg ml-10 flex items-baseline space-x-4">
               <router-link class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/pred">Prédiction</router-link>
-              <router-link class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/model">Modèles</router-link>
-              <router-link class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/monitor">Monitoring</router-link>
+              <router-link v-if="isSuperUser" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/model">Modèles</router-link>
+              <router-link v-if="isSuperUser" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/monitor">Monitoring</router-link>
               <router-link class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/logout">Log Out</router-link>
             </div>
           </div>
@@ -18,7 +18,13 @@
     </nav>
 </template>
 <script>
-    export default {
-        name: 'NavBar',
+
+export default {
+  name: 'NavBar',
+  data(){
+    return{
+      isSuperUser : this.$store.state.isSuperUser,
     }
+  },
+}
 </script>

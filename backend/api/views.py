@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 #User Login
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from django.contrib.auth.models import User
 from .serializers import UserSerializer
 #Pred
@@ -21,6 +21,12 @@ import os
 import uuid
 import base64
 import io
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 #View destiné au admin
 class AdminModelViewset(viewsets.ModelViewSet):
@@ -73,6 +79,9 @@ class ModelViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Model.objects.filter(status = True)
     serializer_class = ModelSerializer
 
+class UserDetailView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 class UserCreateAPIView(CreateAPIView):
     queryset = User.objects.all()

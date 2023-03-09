@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
 from pathlib import Path
 import os
 
@@ -93,7 +92,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'classifr',
         'USER': 'postgres',
-        'PASSWORD': 'dia974',
+        'PASSWORD': '0000',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -152,3 +151,4 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     )
 }
+
