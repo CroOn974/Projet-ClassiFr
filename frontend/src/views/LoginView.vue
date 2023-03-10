@@ -52,6 +52,11 @@
         }
       },
       methods: {
+        /**
+         * Inscription et Connection
+         * 
+         * 
+         */
         authentication() { 
           if (!this.showSignup) {
             this.$store.dispatch('userLogin', {

@@ -216,16 +216,30 @@ export default {
             
         }
     },
+    /**
+     * Récupère la liste des modèles
+     * 
+     * 
+     */
     async created(){
         var response = await fetch('http://localhost:8000/api/admin/model');
         this.models = await response.json();
     },
 
     methods: {
+        /**
+         * 
+         * 
+         * 
+         */
         async getModels(){
             var response = await fetch('http://localhost:8000/api/admin/model');
             this.models = await response.json();
         },
+        /**
+         * Switch l'etat du modèle
+         * @param {object} event 
+         */
         async switch_etat(event) {
             const modelId = event.target.id;
             
@@ -243,7 +257,10 @@ export default {
             const index = this.models.findIndex(m => m.id === updatedModel.id);
             this.models.splice(index, 1, updatedModel);
         },
-
+        /**
+         * Ferme le modal
+         * @param {string} id 
+         */
         deleteModal(id){
 
           let delModal = document.getElementById('deleteModal')
@@ -251,7 +268,10 @@ export default {
           this.toDelete = id
 
         },
-
+        /**
+         * Delete le modèle
+         * @param {string} id 
+         */
         async deleteModel(id){
             
             const model = this.models.find(m => m.id === id);
@@ -269,7 +289,10 @@ export default {
             let delModal = document.getElementById('deleteModal')
             delModal.classList.toggle("hidden")
         },
-        
+        /**
+         * Permet ouvrir le chilrow
+         * @param {string} id 
+         */
         toggleChildRow(id) {
             let children = document.getElementsByClassName("child");
             for (let i = 0; i < children.length; i++) {
@@ -279,13 +302,19 @@ export default {
                 }
             }
         },
+        /**
+         * Ouvre modal
+         * @param {string} id 
+         */
         updateModel(id){
-            console.log(id)
             this.selectModel = id
             document.getElementById('UpdateModal').classList.toggle("hidden")
 
-
         },
+        /**
+         * Update les information sur le modèle
+         * 
+         */
         async updateInfo(){
           
             document.getElementById('UpdateModal').classList.toggle("hidden")

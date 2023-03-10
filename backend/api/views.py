@@ -237,9 +237,9 @@ class MonitorViewset(viewsets.ModelViewSet):
     def moniModel(self, request, pk):
         id_model = self.kwargs.get('pk')
         if int(id_model) > 0:
-            queryset = Predict.objects.filter(id_model=id_model)
+            queryset = Predict.objects.filter(id_model=id_model).order_by('id_predict')
         else:
-            queryset = Predict.objects.all()
+            queryset = Predict.objects.all().order_by('id_predict')
 
         print(queryset)
         serializer = PredictSerializer(queryset, many=True)
@@ -254,8 +254,6 @@ class LabelViewset(viewsets.ReadOnlyModelViewSet):
     serializer_class = LabelSerializer
 
     
-
-
 ##
 # Réalisé des prédictions sur les image envoyer
 # Parameter

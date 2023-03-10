@@ -102,18 +102,25 @@
         }   
     },
     methods: {    
-    // récupère la liste de tous les labeles
+    /**
+     * Récupère la liste de tous les labeles
+     * 
+     * 
+     */
     async getLabel(){
       var response = await fetch('http://localhost:8000/api/label');
       this.labels = await response.json();
     },
-    // permet de crée un model
+    /**
+     * Permet de crée un model
+     * 
+     * 
+     */
     async createModel(){
+      // récupère les elements selectionné
       const checkboxes = document.querySelectorAll('input[name="type[]"]:checked');
       const selectedLabels = Array.from(checkboxes).map(cb => cb.value);
       this.model.labels = selectedLabels
-
-      console.log(this.model);
 
       var response = await fetch('http://localhost:8000/api/admin/model/',{
           method:'post',

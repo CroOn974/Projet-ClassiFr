@@ -19,7 +19,7 @@
                   <th scope="col" class="px-6 py-4">FeedBack</th>
                 </tr>
               </thead>
-              <tbody v-for="predict in predictions" :key="predict.id_predict">
+              <tbody :id="predict.id_predict" v-for="predict in predictions" :key="predict.id_predict">
                 <tr class="border-b dark:border-neutral-500">
                   <td class="whitespace-nowrap px-6 py-4"><img :src="predict.image" alt=""></td>
                   <td class="whitespace-nowrap px-6 py-4">{{ predict.libele }}</td>
@@ -34,6 +34,8 @@
                     ></textarea>
                     <div class="m-auto">
                       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" @click="saveFeedback(predict)">Envoyer</button>
+                      <br><br>
+                      <button class="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" @click="deletePredict(predict)">Delete</button>
                     </div>
                     
                   </td>
@@ -66,6 +68,12 @@
         filterBy: "0",
       };
     },
+    /**
+     *  Récupère la liste de prédiction et de modèles
+     *  Liste de modèle -> modelList
+     *  Liste de prédiction -> predictions
+     * 
+     */
     async created() {
       var response = await fetch("http://localhost:8000/api/monitor");
       this.predictions = await response.json();
@@ -75,6 +83,10 @@
       console.log(this.modelList);
     },
     methods: {
+      /**
+       * Permet de sauvegardé le feedback sur un prédiction
+       * @param {object} predict 
+       */
       async saveFeedback(predict) {
         const response = await fetch(`http://localhost:8000/api/monitor/${predict.id_predict}`+'/', {
           method: 'PATCH',
@@ -89,6 +101,10 @@
           console.error('Error saving feedback:', response.status);
         }
       },
+      /**
+       * Permet de filtrer le tableau selon le modèle selectionner
+       * 
+       */
       async filteredPredictions() {
         var id = this.filterBy
         console.log(id);
@@ -97,6 +113,27 @@
 
 
       },
+      async deletePredict(predict){
+
+        const response = await fetch(`http://localhost:8000/api/monitor/${predict.id_predict}`+'/',{
+                method:'delete',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(predict)
+        });
+        if (response.ok) {
+          console.log('Prediction deleted successfully!');
+          // Remove the deleted prediction from the DOM
+          const predictionElement = document.getElementById(predict.id_predict);
+          predictionElement.remove();
+        } else {
+          console.error('Error deleting prediction:', response.status);
+        }
+
+
+
+      }
     },
     computed: {
 
