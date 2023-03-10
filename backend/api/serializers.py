@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Model, DateCreate, Predict
+from api.models import Model, DateCreate, Predict, Label
 from django.contrib.auth.models import User
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -22,11 +22,7 @@ class ModelSerializer(serializers.ModelSerializer):
 
     def get_labels(self, obj):
         return [associer.libele.libele for associer in obj.associer_set.all()]
-
-class DateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DateCreate
-        fields = '__all__'
+    
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -48,3 +44,10 @@ class PredictSerializer(serializers.ModelSerializer):
     class Meta:
         model = Predict
         fields = '__all__'
+
+class LabelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Label
+        fields = '__all__'
+
+        

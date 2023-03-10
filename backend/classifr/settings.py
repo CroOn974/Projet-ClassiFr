@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     #my app
     'api',
     'authentication',
-    'model',
-    'predict',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
 
@@ -92,7 +90,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'classifr',
         'USER': 'postgres',
-        'PASSWORD': 'dia974',
+        'PASSWORD': '0000',
         'HOST': 'localhost',
         'PORT': '5432',
     }

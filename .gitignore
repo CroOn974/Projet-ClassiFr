@@ -9,3 +9,6 @@ media
 
 # mypy 
 .mypy_cache/ 
+
+# dataset
+backend/api/dataset/*

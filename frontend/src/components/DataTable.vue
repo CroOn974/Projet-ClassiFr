@@ -10,7 +10,7 @@
                 <th scope="col" class="px-6 py-4">Modèle</th>
                 <th scope="col" class="px-6 py-4">Date</th>
                 <th scope="col" class="px-6 py-4">Accuracy</th>
-                <th scope="col" class="px-6 py-4">Info</th>
+                <th scope="col" class="px-6 py-4">Label</th>
                 <th scope="col" class="px-6 py-4">Status</th>
                 <th scope="col" class="px-6 py-4"></th>
               </tr>
@@ -20,7 +20,7 @@
                 <td class="whitespace-nowrap px-6 py-4">{{model.name}}</td>
                 <td class="whitespace-nowrap px-6 py-4">{{model.jour}}</td>
                 <td class="whitespace-nowrap px-6 py-4">{{model.accuracy}}</td>
-                <td class="whitespace-nowrap px-6 py-4">{{model.info}}</td>
+                <td class="whitespace-nowrap px-6 py-4">{{model.labels}}</td>
                 <td class="whitespace-nowrap px-6 py-4">
                   <div>
                     <input
@@ -126,10 +126,6 @@
             </div>
             <div class="mt-5 sm:mt-6">
               <form class="flex flex-col">
-                <label for="model_name" class="my-3">Nom</label>
-                <input v-model="model.name" type="text" name="Nom du modèle" id="model_name" class="rounded-md border border-gray-300">
-                <label for="model_acc" class="my-3">Accuracy</label>
-                <input v-model="model.accuracy" type="int" name="Accuracy du modèle" id="model_acc" class="rounded-md border border-gray-300">
                 <label for="model_info" class="my-3">Info</label>
                 <input v-model="model.info" type="text" name="Info du modèle" id="model_info" class="rounded-md border border-gray-300">
               </form>
@@ -140,7 +136,7 @@
             <button
               type="button"
               class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 text-base font-medium text-gray-700 m-3"
-              @click="updateModel"
+              @click="updateInfo()"
             >
               Modifier
             </button>
@@ -215,19 +211,35 @@ export default {
                 'info':'',
                 'toDelete':''
             },
-            models: []
+            models: [],
+            selectModel: ''
+            
         }
     },
+    /**
+     * Récupère la liste des modèles
+     * 
+     * 
+     */
     async created(){
         var response = await fetch('http://localhost:8000/api/admin/model');
         this.models = await response.json();
     },
 
     methods: {
+        /**
+         * 
+         * 
+         * 
+         */
         async getModels(){
             var response = await fetch('http://localhost:8000/api/admin/model');
             this.models = await response.json();
         },
+        /**
+         * Switch l'etat du modèle
+         * @param {object} event 
+         */
         async switch_etat(event) {
             const modelId = event.target.id;
             
@@ -245,18 +257,21 @@ export default {
             const index = this.models.findIndex(m => m.id === updatedModel.id);
             this.models.splice(index, 1, updatedModel);
         },
-
+        /**
+         * Ferme le modal
+         * @param {string} id 
+         */
         deleteModal(id){
-
-          console.log(id)
 
           let delModal = document.getElementById('deleteModal')
           delModal.classList.toggle("hidden")
           this.toDelete = id
-          console.log(this.toDelete);
 
         },
-
+        /**
+         * Delete le modèle
+         * @param {string} id 
+         */
         async deleteModel(id){
             
             const model = this.models.find(m => m.id === id);
@@ -274,7 +289,10 @@ export default {
             let delModal = document.getElementById('deleteModal')
             delModal.classList.toggle("hidden")
         },
-        
+        /**
+         * Permet ouvrir le chilrow
+         * @param {string} id 
+         */
         toggleChildRow(id) {
             let children = document.getElementsByClassName("child");
             for (let i = 0; i < children.length; i++) {
@@ -284,17 +302,42 @@ export default {
                 }
             }
         },
+        /**
+         * Ouvre modal
+         * @param {string} id 
+         */
         updateModel(id){
-            console.log(id)
+            this.selectModel = id
             document.getElementById('UpdateModal').classList.toggle("hidden")
-        }
+
+        },
+        /**
+         * Update les information sur le modèle
+         * 
+         */
+        async updateInfo(){
+          
+            document.getElementById('UpdateModal').classList.toggle("hidden")
+
+            var id = this.selectModel
+            
+            var response = await fetch('http://localhost:8000/api/admin/model/'+ id +'/updateInfo/',{
+                method:'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.model)
+                
+              });
+              
+              const updatedModel = await response.json();
+              const index = this.models.findIndex(m => m.id === updatedModel.id);
+              this.models.splice(index, 1, updatedModel);
+
+        },
+        
     },
-  mounted() {
-    // appel de la méthode getModels() toutes les 5 secondes
-    setInterval(() => {
-      this.getModels();
-    }, 5000);
-  }
+
     
 };
 </script>

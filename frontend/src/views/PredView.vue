@@ -20,9 +20,9 @@
       <div class="m-4">
           <h3 class="font-bold text-lg text-slate-50 w-12/12">Récapitulatif des images soumises :</h3>
       </div>
-      <div class="flex flex-wrap w-10/12 mx-auto justify-center">
-        <div v-for="(item, index) in combinedList" :key="index" class="m-4">
-              <div :id="index" class="block w-96 rounded-lg bg-white shadow-lg dark:bg-neutral-700">
+      <div class="flex flex-wrap mx-auto justify-center">
+        <div :id="index" v-for="(item, index) in combinedList" :key="index" class="m-4">
+              <div class="block w-96 rounded-lg bg-white shadow-lg dark:bg-neutral-700">
                   <a href="#!">
                       <img :src="item.image" alt="Image soumise par l'utilisateur" class="rounded-t-lg h-64 object-cover w-full">
                   </a>
@@ -72,7 +72,11 @@ export default {
     }
   },
   computed: {
-    // Combinée des images et de leurs prédictions en utilisant les tableaux imageList et predList
+    /**
+     * Combinée des images et de leurs prédictions en utilisant les tableaux imageList et predList
+     * 
+     * 
+     */
     combinedList() {
       return this.imageList.map((item, index) => {
         return {
@@ -83,7 +87,10 @@ export default {
     },
     
   },
-  // Exécute une requête asynchrone pour récupérer une liste de modèles à partir de l'API
+  /**
+   * Exécute une requête asynchrone pour récupérer une liste de modèles à partir de l'API
+   * 
+   */
   async mounted() {
     try {
       const response = await fetch('http://localhost:8000/api/model');
@@ -95,8 +102,13 @@ export default {
     }
   },
   methods: {
-  // Soumet les images sélectionnées pour prédiction en utilisant l'API
+  /**
+   * Soumet les images sélectionnées pour une prédiction
+   * 
+   * 
+   */
   async submitImage() {
+    // reset les variable et pas pret a False pour enlevé l'affichage de image
     this.imageList= [];
     this.predList= [];
     this.pret = false
@@ -134,7 +146,11 @@ export default {
     }
     this.pret = true
   },
-  // Feedback sur une image
+  /**
+   * Enregistre feedback sur une image
+   * @param {boolean} avis 
+   * @param {integer} index 
+   */
   async userFeedback(avis,index){
     
     let img_pred = this.combinedList[index].image;
@@ -159,7 +175,7 @@ export default {
       console.log(error);
     }
 
-    // enlève élement 
+    // retire l'element qui a subit le feedback
     const element = document.getElementById(index);
     element.parentNode.removeChild(element);
     
